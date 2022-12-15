@@ -16,4 +16,5 @@ public interface PopServInter {
     Population modifierPopu(Long idPop,Population population);
 
     String DeletePopu(Long idPop);
+    Population popById(long id);
 }

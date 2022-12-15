@@ -36,4 +36,9 @@ public class PopServImplement implements PopServInter{
         popRep.deleteById(idPop);
         return "Population supprimer avec succes";
     }
+
+    @Override
+    public Population popById(long id) {
+        return popRep.getById(id);
+    }
 }

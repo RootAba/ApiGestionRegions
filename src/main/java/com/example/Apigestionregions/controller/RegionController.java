@@ -1,16 +1,21 @@
 package com.example.Apigestionregions.controller;
 
 
+import com.example.Apigestionregions.config.SaveImage;
 import com.example.Apigestionregions.modele.Pays;
 import com.example.Apigestionregions.modele.Population;
 import com.example.Apigestionregions.modele.Regions;
 import com.example.Apigestionregions.service.PaysServImplement;
 import com.example.Apigestionregions.service.PopServImplement;
 import com.example.Apigestionregions.service.RegionServImplement;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,7 +32,42 @@ private RegionServImplement reSeImpt;
     private PopServImplement popServImplement;
     @ApiOperation(value = "Ajout de region en tenant compte du pays et de la population")
     @PostMapping("/creation")
-public Regions creation(@RequestBody Regions region, Population population){
+
+    public  String CreationRegion(@RequestParam(value = "data") String reg,
+                                  @RequestParam(value = "population") String population,
+                            //      @RequestParam(value = "user") String userVenant,
+                                  @RequestParam(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
+        Regions regions = null;
+        Population population1=null;
+
+        try {
+            regions = new JsonMapper().readValue(reg, Regions.class);
+            System.out.println(regions);
+           // utilisateurs = new JsonMapper().readValue(userVenant, Utilisateur.class);
+        } catch (Exception e) {
+            System.out.println(regions);
+        }
+
+        //       Enregistrer image
+        try {
+            regions.setImage(SaveImage.save("regions", file, regions.getNomRegion()));
+        } catch (Exception e) {
+            // TODO: handle exception
+            return "erreur lors de l'importation del'image";
+        }
+        Pays pays =regions.getPays();
+        if(pays ==null){
+            return "pays n'existe pas";
+        }
+        else{
+            paysSeImpt.ajouterPays(regions.getPays());
+            population1 = new JsonMapper().readValue(population, Population.class);
+            popServImplement.ajouterPopulation(population1);
+            reSeImpt.AjoutRegion(regions);
+        }
+        return "ajouter avec succes";
+    }
+    /*public Regions creation(@RequestBody Regions region, Population population){
 
         Pays pays =region.getPays();
       //  if(pays==null){
@@ -35,7 +75,7 @@ public Regions creation(@RequestBody Regions region, Population population){
             popServImplement.ajouterPopulation(population);
      //   }
         return  reSeImpt.AjoutRegion(region);
-}
+}*/
 
     @ApiOperation(value = "Affichage de la liste des régions avec Pays")
     @GetMapping("/afficher")

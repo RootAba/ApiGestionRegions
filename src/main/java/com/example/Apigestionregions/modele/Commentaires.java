@@ -17,21 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-
-public class Regions {
+public class Commentaires {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idRegions;
-    private String codeRegions,nomRegion,superficie,langue,domaine,image;
+    private Long idcom;
+    private String contenucom;
+    @ManyToOne
+    private User user;
 
 
     @ManyToOne
-private  Pays pays;
-
-    @ManyToOne
-    private  Population population;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "regions", cascade = CascadeType.ALL)
-    List<Sitetouristique> sitetouristiques = new ArrayList<>();
+    private Sitetouristique sitetouristique;
 }
